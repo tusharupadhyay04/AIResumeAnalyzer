@@ -3,10 +3,18 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const fs = require('fs');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load environment variables
 dotenv.config();
+
+// Ensure uploads directory exists (it's gitignored so won't exist on fresh deploys)
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Connect to Database
 connectDB();
