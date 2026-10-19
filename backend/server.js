@@ -15,14 +15,34 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
-app.use(helmet());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL,
+  ].filter(Boolean),
+  credentials: true,
+}));
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'frame-src': ["'self'"],
+      'object-src': ["'self'"],
+    },
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(morgan('dev'));
 
 // Routes
 app.get('/', (req, res) => {
   res.send('AI Resume Analyzer API is running...');
 });
+
+// Static file serving for uploaded resumes (PDFs)
+app.use('/uploads', express.static('uploads'));
 
 // Auth Routes
 app.use('/api/auth', require('./routes/authRoutes'));
